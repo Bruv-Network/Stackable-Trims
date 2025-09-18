@@ -1,0 +1,4 @@
+{
+  "gamerule.maxTrimStack": "Nombre maximal d'ornements d'armure pouvant être appliqués",
+  "gamerule.allowDuplicateTrims": "Autoriser les ornements d'armure en double"
+}

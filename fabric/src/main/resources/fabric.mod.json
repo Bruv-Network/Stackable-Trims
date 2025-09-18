@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "stackabletrims",
+  "version": "${version}",
+
+  "name": "Stackable Trims",
+  "description": "Allows you to stack as many trims as you want!",
+  "authors": [
+    "JRex",
+    "Golem"
+  ],
+
+  "contact": {
+    "issues": "https://github.com/Bruv-Network/Stackable-Trims/issues"
+  },
+
+  "license": "GPL 3.0",
+  "icon": "icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.golem.stackabletrims.fabric.StackableTrimsFabric"
+    ],
+    "client": [
+      "com.golem.stackabletrims.fabric.client.StackableTrimsFabricClient"
+    ]
+  },
+  "mixins": [
+    "stackabletrims-fabric.mixins.json",
+    "stackabletrims.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": "*",
+    "minecraft": "1.21.1",
+    "fabric-api": "*"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.golem.stackabletrims.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "AnvilScreenHandlerMixin",
+    "ArmorTrimMixin",
+    "ItemStackMixin",
+    "SmithingTrimRecipeMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

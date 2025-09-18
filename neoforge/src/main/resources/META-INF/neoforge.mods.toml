@@ -1,0 +1,34 @@
+modLoader = "javafml"
+loaderVersion = "[2,)"
+issueTrackerURL = "https://github.com/Bruv-Network/Stackable-Trims/issues"
+license = "GPL 3.0"
+
+[[mods]]
+modId = "stackabletrims"
+version = "${version}"
+displayName = "Stackable Trims"
+authors = "Jrex, Golem"
+description = '''
+Allows you to stack as many trims as you want!
+'''
+logoFile = "icon.png"
+
+[[dependencies.stackabletrims]]
+modId = "neoforge"
+type = "required"
+versionRange = "[0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.stackabletrims]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21,1.21.1]"
+ordering = "NONE"
+side = "BOTH"
+
+[[mixins]]
+config="stackabletrims.mixins.json"
+
+[[mixins]]
+config="stackabletrims-neoforge.mixins.json"

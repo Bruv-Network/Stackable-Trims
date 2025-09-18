@@ -1,0 +1,4 @@
+{
+  "gamerule.maxTrimStack": "적용할 수 있는 방어구 장식의 최대 수",
+  "gamerule.allowDuplicateTrims": "중복된 방어구 장식 허용"
+}
