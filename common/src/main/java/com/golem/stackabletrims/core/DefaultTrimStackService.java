@@ -7,7 +7,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.armortrim.ArmorTrim;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,9 +27,7 @@ public class DefaultTrimStackService implements TrimStackService {
             return Optional.empty();
         }
 
-        List<ArmorTrim> reversed = new ArrayList<>(trims);
-        Collections.reverse(reversed);
-        return Optional.of(reversed);
+        return Optional.of(new ArrayList<>(trims));
     }
 
     @Override
