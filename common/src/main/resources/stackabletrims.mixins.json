@@ -2,11 +2,12 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.golem.stackabletrims.mixin",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "AnvilScreenHandlerMixin",
     "ArmorTrimMixin",
     "ItemStackMixin",
+    "SmithingRecipeMixin",
     "SmithingTrimRecipeMixin"
   ],
   "injectors": {

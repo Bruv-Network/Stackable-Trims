@@ -1,5 +1,5 @@
 plugins {
-	id 'com.github.johnrengelman.shadow'
+	id 'com.gradleup.shadow'
 }
 
 
@@ -48,3 +48,5 @@ shadowJar {
 	configurations = [project.configurations.shadowBundle]
 	archiveClassifier = null
 }
+
+assemble.dependsOn shadowJar
