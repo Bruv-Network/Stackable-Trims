@@ -1,7 +1,7 @@
 package com.golem.stackabletrims;
 
 import com.golem.stackabletrims.core.GameRuleTrimPolicyResolver;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

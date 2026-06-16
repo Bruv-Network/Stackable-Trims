@@ -1,7 +1,7 @@
 package com.golem.stackabletrims.core;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.armortrim.ArmorTrim;
+import net.minecraft.world.item.equipment.trim.ArmorTrim;
 
 import java.util.List;
 import java.util.Optional;

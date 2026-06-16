@@ -5,8 +5,9 @@ import com.golem.stackabletrims.component.StackableTrimsComponents;
 import com.golem.stackabletrims.core.GameRuleTrimPolicyResolver;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.item.armortrim.ArmorTrim;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.item.equipment.trim.ArmorTrim;
+import net.minecraft.world.level.gamerules.GameRuleCategory;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
@@ -45,16 +46,16 @@ public class StackableTrimsNeoForge {
         StackableTrimsComponents.STACKABLETRIMS = STACKABLETRIMS_COMPONENT.get();
 
         event.enqueueWork(() -> {
-            GameRuleTrimPolicyResolver.MAX_TRIM_STACK = GameRules.register(
+            GameRuleTrimPolicyResolver.MAX_TRIM_STACK = GameRules.registerInteger(
                     "maxTrimStack",
-                    GameRules.Category.MISC,
-                    GameRules.IntegerValue.create(32)
+                    GameRuleCategory.MISC,
+                    32, 1, 100
             );
 
-            GameRuleTrimPolicyResolver.ALLOW_DUPLICATE_TRIMS = GameRules.register(
+            GameRuleTrimPolicyResolver.ALLOW_DUPLICATE_TRIMS = GameRules.registerBoolean(
                     "allowDuplicateTrims",
-                    GameRules.Category.MISC,
-                    GameRules.BooleanValue.create(false)
+                    GameRuleCategory.MISC,
+                    false
             );
         });
     }

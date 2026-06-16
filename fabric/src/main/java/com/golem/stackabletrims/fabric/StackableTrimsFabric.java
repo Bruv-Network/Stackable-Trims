@@ -5,13 +5,12 @@ import com.golem.stackabletrims.component.StackableTrimsComponents;
 import com.golem.stackabletrims.core.GameRuleTrimPolicyResolver;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.gamerules.GameRuleCategory;
 
 public class StackableTrimsFabric implements ModInitializer {
     public static boolean isModLoaded(String modId) {
@@ -26,19 +25,16 @@ public class StackableTrimsFabric implements ModInitializer {
         StackableTrims.setIsBetterTrimTooltipsEnabled(FabricLoader.getInstance().isModLoaded("better-trim-tooltips"));
         StackableTrimsComponents.STACKABLETRIMS = Registry.register(
                 BuiltInRegistries.DATA_COMPONENT_TYPE,
-                ResourceLocation.fromNamespaceAndPath(StackableTrims.MOD_ID, "stackabletrims"),
+                Identifier.fromNamespaceAndPath(StackableTrims.MOD_ID, "stackabletrims"),
                 StackableTrimsComponents.createStackableTrimsComponent()
         );
-        GameRuleTrimPolicyResolver.MAX_TRIM_STACK = GameRuleRegistry.register(
-                "maxTrimStack",
-                GameRules.Category.MISC,
-                GameRuleFactory.createIntRule(32, 1, 100)
-        );
-        GameRuleTrimPolicyResolver.ALLOW_DUPLICATE_TRIMS = GameRuleRegistry.register(
-                "allowDuplicateTrims",
-                GameRules.Category.MISC,
-                GameRuleFactory.createBooleanRule(false)
-        );
+        GameRuleTrimPolicyResolver.MAX_TRIM_STACK = GameRuleBuilder.forInteger(32)
+                .category(GameRuleCategory.MISC)
+                .range(1, 100)
+                .buildAndRegister(Identifier.fromNamespaceAndPath(StackableTrims.MOD_ID, "max_trim_stack"));
+        GameRuleTrimPolicyResolver.ALLOW_DUPLICATE_TRIMS = GameRuleBuilder.forBoolean(false)
+                .category(GameRuleCategory.MISC)
+                .buildAndRegister(Identifier.fromNamespaceAndPath(StackableTrims.MOD_ID, "allow_duplicate_trims"));
         ServerTickEvents.END_SERVER_TICK.register(server ->
                 StackableTrims.setGameRules(server.getGameRules())
         );

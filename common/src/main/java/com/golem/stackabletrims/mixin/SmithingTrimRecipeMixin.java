@@ -4,11 +4,10 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.golem.stackabletrims.core.CoreServices;
 import com.golem.stackabletrims.core.TrimPolicy;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.armortrim.ArmorTrim;
-import net.minecraft.world.item.armortrim.TrimMaterial;
-import net.minecraft.world.item.armortrim.TrimPattern;
+import net.minecraft.world.item.equipment.trim.ArmorTrim;
+import net.minecraft.world.item.equipment.trim.TrimMaterial;
+import net.minecraft.world.item.equipment.trim.TrimPattern;
 import net.minecraft.world.item.crafting.SmithingRecipeInput;
 import net.minecraft.world.item.crafting.SmithingTrimRecipe;
 import net.minecraft.world.level.Level;
@@ -41,12 +40,12 @@ public class SmithingTrimRecipeMixin {
     }
 
     @Inject(
-            method = "assemble(Lnet/minecraft/world/item/crafting/SmithingRecipeInput;Lnet/minecraft/core/HolderLookup$Provider;)Lnet/minecraft/world/item/ItemStack;",
+            method = "assemble(Lnet/minecraft/world/item/crafting/SmithingRecipeInput;)Lnet/minecraft/world/item/ItemStack;",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/item/ItemStack;get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;"),
             cancellable = true
     )
-    public void handleStackableTrims(SmithingRecipeInput input, HolderLookup.Provider registries,
+    public void handleStackableTrims(SmithingRecipeInput input,
                                      CallbackInfoReturnable<ItemStack> cir,
                                      @Local ItemStack baseStack,
                                      @Local(ordinal = 0) Optional<Holder.Reference<TrimMaterial>> materialOpt,

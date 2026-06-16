@@ -4,7 +4,7 @@ import com.golem.stackabletrims.component.StackableTrimsComponents;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.armortrim.ArmorTrim;
+import net.minecraft.world.item.equipment.trim.ArmorTrim;
 
 import java.util.ArrayList;
 import java.util.List;

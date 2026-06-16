@@ -9,8 +9,8 @@ public class StackableTrimsFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client.level != null) {
-                StackableTrims.setGameRules(client.level.getGameRules());
+            if (client.level != null && client.getSingleplayerServer() != null) {
+                StackableTrims.setGameRules(client.getSingleplayerServer().getGameRules());
             }
         });
         

@@ -1,72 +1,32 @@
 package com.golem.stackabletrims.fabric.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.golem.stackabletrims.core.CoreServices;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
-import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.core.Holder;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.armortrim.ArmorTrim;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.world.item.equipment.trim.ArmorTrim;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * TODO: Rewrite for 26.1 rendering system.
+ *
+ * In 26.1, the rendering pipeline has been completely overhauled:
+ * - HumanoidArmorLayer now uses HumanoidRenderState instead of LivingEntity
+ * - renderArmorPiece is now private (no longer injectable)
+ * - renderTrim/renderGlint methods have been removed
+ * - Trim rendering is handled by EquipmentLayerRenderer.renderLayers()
+ * - MultiBufferSource is replaced by SubmitNodeCollector
+ *
+ * A new approach is needed to render stacked trims, likely by:
+ * 1. Injecting into EquipmentLayerRenderer.renderLayers to call it
+ *    multiple times for each stacked trim, or
+ * 2. Redirecting the TRIM data component read to iterate through
+ *    the stackable trims list.
+ */
 @Mixin(HumanoidArmorLayer.class)
-public abstract class ArmorFeatureRendererMixin<T extends LivingEntity, M extends HumanoidModel<T>, A extends HumanoidModel<T>>
-        extends RenderLayer<T, M> {
-
-    @Shadow
-    @Final
-    private TextureAtlas armorTrimAtlas;
-
-    @Shadow
-    protected abstract void renderTrim(Holder<ArmorMaterial> armorMaterial, PoseStack poseStack,
-                                       MultiBufferSource bufferSource, int packedLight,
-                                       ArmorTrim trim, A model, boolean innerTexture);
-
-    @Shadow
-    protected abstract void renderGlint(PoseStack poseStack, MultiBufferSource vertexConsumers,
-                                        int light, A model);
-
-    protected ArmorFeatureRendererMixin(RenderLayerParent<T, M> context) {
-        super(context);
-    }
-
-    @Inject(
-            method = "renderArmorPiece",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/item/ItemStack;hasFoil()Z",
-                    shift = At.Shift.BEFORE),
-            cancellable = true
-    )
-    private void renderStackableTrims(PoseStack poseStack, MultiBufferSource bufferSource,
-                                      T livingEntity, EquipmentSlot slot, int packedLight,
-                                      A model, CallbackInfo ci,
-                                      @Local ItemStack itemStack, @Local ArmorItem armorItem, @Local boolean innerTexture) {
-
-        CoreServices.trims().getTrims(itemStack).ifPresent(armorTrims -> {
-            for (ArmorTrim armorTrim : armorTrims) {
-                renderTrim(armorItem.getMaterial(), poseStack, bufferSource,
-                        packedLight, armorTrim, model, innerTexture);
-            }
-        });
-
-        if (itemStack.hasFoil()) {
-            renderGlint(poseStack, bufferSource, packedLight, model);
-        }
-
-        ci.cancel();
-    }
+public class ArmorFeatureRendererMixin {
+    // Rendering mixin placeholder - needs rewrite for 26.1 rendering system
 }

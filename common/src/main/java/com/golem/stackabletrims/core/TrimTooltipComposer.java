@@ -1,13 +1,13 @@
 package com.golem.stackabletrims.core;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.armortrim.ArmorTrim;
+import net.minecraft.world.item.equipment.trim.ArmorTrim;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +15,9 @@ import java.util.List;
 public final class TrimTooltipComposer {
 
     private static final Component UPGRADE_TEXT = Component.translatable(
-            Util.makeDescriptionId("item", ResourceLocation.withDefaultNamespace("smithing_template.upgrade"))
+            Util.makeDescriptionId("item", Identifier.withDefaultNamespace("smithing_template.upgrade"))
     ).withStyle(ChatFormatting.GRAY);
-    private static final String UPGRADE_KEY = Util.makeDescriptionId("item", ResourceLocation.withDefaultNamespace("smithing_template.upgrade"));
+    private static final String UPGRADE_KEY = Util.makeDescriptionId("item", Identifier.withDefaultNamespace("smithing_template.upgrade"));
 
     private TrimTooltipComposer() {}
 
