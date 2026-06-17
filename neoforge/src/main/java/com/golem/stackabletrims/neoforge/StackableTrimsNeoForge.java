@@ -47,13 +47,13 @@ public class StackableTrimsNeoForge {
 
         event.enqueueWork(() -> {
             GameRuleTrimPolicyResolver.MAX_TRIM_STACK = GameRules.registerInteger(
-                    "maxTrimStack",
+                    "max_trim_stack",
                     GameRuleCategory.MISC,
                     32, 1, 100
             );
 
             GameRuleTrimPolicyResolver.ALLOW_DUPLICATE_TRIMS = GameRules.registerBoolean(
-                    "allowDuplicateTrims",
+                    "allow_duplicate_trims",
                     GameRuleCategory.MISC,
                     false
             );

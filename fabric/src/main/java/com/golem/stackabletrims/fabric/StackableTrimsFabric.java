@@ -31,10 +31,10 @@ public class StackableTrimsFabric implements ModInitializer {
         GameRuleTrimPolicyResolver.MAX_TRIM_STACK = GameRuleBuilder.forInteger(32)
                 .category(GameRuleCategory.MISC)
                 .range(1, 100)
-                .buildAndRegister(Identifier.withDefaultNamespace("maxTrimStack"));
+                .buildAndRegister(Identifier.withDefaultNamespace("max_trim_stack"));
         GameRuleTrimPolicyResolver.ALLOW_DUPLICATE_TRIMS = GameRuleBuilder.forBoolean(false)
                 .category(GameRuleCategory.MISC)
-                .buildAndRegister(Identifier.withDefaultNamespace("allowDuplicateTrims"));
+                .buildAndRegister(Identifier.withDefaultNamespace("allow_duplicate_trims"));
         ServerTickEvents.END_SERVER_TICK.register(server ->
                 StackableTrims.setGameRules(server.getGameRules())
         );
