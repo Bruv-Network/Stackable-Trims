@@ -19,6 +19,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.List;
 
+import net.neoforged.neoforge.registries.RegisterEvent;
+
 @Mod(StackableTrims.MOD_ID)
 public class StackableTrimsNeoForge {
 
@@ -34,6 +36,7 @@ public class StackableTrimsNeoForge {
         COMPONENTS.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::onRegister);
         NeoForge.EVENT_BUS.addListener(this::onServerTick);
 
         //better-trim-tooltips compatibility
@@ -42,10 +45,8 @@ public class StackableTrimsNeoForge {
         StackableTrims.LOGGER.info("Stackable Trims NeoForge initialized");
     }
 
-    private void commonSetup(FMLCommonSetupEvent event) {
-        StackableTrimsComponents.STACKABLETRIMS = STACKABLETRIMS_COMPONENT.get();
-
-        event.enqueueWork(() -> {
+    private void onRegister(RegisterEvent event) {
+        if (event.getRegistryKey().equals(Registries.GAME_RULE)) {
             GameRuleTrimPolicyResolver.MAX_TRIM_STACK = GameRules.registerInteger(
                     "max_trim_stack",
                     GameRuleCategory.MISC,
@@ -57,7 +58,11 @@ public class StackableTrimsNeoForge {
                     GameRuleCategory.MISC,
                     false
             );
-        });
+        }
+    }
+
+    private void commonSetup(FMLCommonSetupEvent event) {
+        StackableTrimsComponents.STACKABLETRIMS = STACKABLETRIMS_COMPONENT.get();
     }
 
     private void onServerTick(ServerTickEvent.Post event) {
