@@ -6,7 +6,6 @@
   "name": "Stackable Trims",
   "description": "Allows you to stack as many trims as you want!",
   "authors": [
-    "JRex",
     "Golem"
   ],
 
@@ -33,7 +32,7 @@
 
   "depends": {
     "fabricloader": "*",
-    "minecraft": "26.1",
+    "minecraft": ">=26.1",
     "fabric-api": "*"
   }
 }

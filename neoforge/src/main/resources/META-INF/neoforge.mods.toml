@@ -7,7 +7,7 @@ license = "GPL 3.0"
 modId = "stackabletrims"
 version = "${version}"
 displayName = "Stackable Trims"
-authors = "Jrex, Golem"
+authors = "Golem"
 description = '''
 Allows you to stack as many trims as you want!
 '''

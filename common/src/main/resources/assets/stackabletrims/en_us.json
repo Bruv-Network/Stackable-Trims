@@ -1,4 +1,4 @@
 {
-  "gamerule.maxTrimStack": "Maximum amount of armor trims that can be stacked",
-  "gamerule.allowDuplicateTrims": "Allow duplicate armor trims to be stacked"
+  "gamerule.max_trim_stack": "Maximum amount of armor trims that can be stacked",
+  "gamerule.allow_duplicate_trims": "Allow duplicate armor trims to be stacked"
 }
