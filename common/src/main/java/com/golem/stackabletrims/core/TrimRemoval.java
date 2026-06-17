@@ -5,7 +5,6 @@ import net.minecraft.world.item.Items;
 
 public class TrimRemoval {
 
-
     public static boolean canRemoveTrims(ItemStack armorStack, ItemStack toolStack) {
         if (armorStack.isEmpty() || toolStack.isEmpty()) {
             return false;

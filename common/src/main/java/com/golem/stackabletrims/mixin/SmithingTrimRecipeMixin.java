@@ -6,17 +6,12 @@ import com.golem.stackabletrims.core.TrimPolicy;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
-import net.minecraft.world.item.equipment.trim.TrimMaterial;
 import net.minecraft.world.item.equipment.trim.TrimPattern;
-import net.minecraft.world.item.crafting.SmithingRecipeInput;
 import net.minecraft.world.item.crafting.SmithingTrimRecipe;
-import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Optional;
 
 @Mixin(SmithingTrimRecipe.class)
 public class SmithingTrimRecipeMixin {
