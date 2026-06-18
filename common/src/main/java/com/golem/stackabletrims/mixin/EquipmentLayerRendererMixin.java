@@ -132,14 +132,14 @@ public class EquipmentLayerRendererMixin {
         // Don't render trims on baby models (vanilla skips this)
         if (layerType == EquipmentClientInfo.LayerType.HUMANOID_BABY) return;
 
-        int order = orderStart;
         for (ArmorTrim trim : ctx.trims) {
             TextureAtlasSprite sprite = stackabletrims$lookupSprite(trim, ctx.layerType, ctx.equipmentAssetId);
             if (sprite == null) continue;
 
             RenderType renderType = Sheets.armorTrimsSheet(trim.pattern().value().decal());
 
-            OrderedSubmitNodeCollector orderedCollector = collector.order(order++);
+            // Use orderStart for all trims to ensure they render in the correct phase and don't clash with glint/overlays
+            OrderedSubmitNodeCollector orderedCollector = collector.order(orderStart);
             stackabletrims$submitTrimModel(orderedCollector, model, state, poseStack, renderType,
                     light, sprite, dyeColor);
         }
