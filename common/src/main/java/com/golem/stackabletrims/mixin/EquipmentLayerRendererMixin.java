@@ -5,14 +5,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.EquipmentClientInfo;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.EquipmentAsset;
@@ -22,9 +20,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -61,87 +57,50 @@ public class EquipmentLayerRendererMixin {
     }
 
     /**
-     * Thread-local context to pass stacked trim data between the redirect and inject.
-     */
-    @Unique
-    private static final ThreadLocal<RenderContext> stackabletrims$context = new ThreadLocal<>();
-
-    /**
-     * Redirect the vanilla TRIM component read to suppress vanilla's single-trim rendering
-     * when stacked trims are present.
+     * Redirect vanilla's single-trim {@code submitModel} call (the last {@code submitModel} in
+     * {@code renderLayers}, ordinal 2 after the base layer and foil calls).
+     *
+     * <p>Vanilla submits the trim through {@code submitNodeCollector.order(nextOrder++)}, i.e. a
+     * collector ordered <em>after</em> all the base armor layers so the trim decal draws on top.
+     * By redirecting at this exact call we reuse that correct ordering for every stacked trim,
+     * instead of submitting them to the base-layer order bucket. The latter only happened to work
+     * in the vanilla pipeline because the trims were submitted last within the shared bucket; under
+     * Sodium, which reorders/batches a bucket by render type, the opaque armor would draw over the
+     * trim decals and they would vanish.
      */
     @Redirect(
             method = "renderLayers(Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;II)V",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/item/ItemStack;get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;")
+                    target = "Lnet/minecraft/client/renderer/OrderedSubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V",
+                    ordinal = 2)
     )
-    private <T> T stackabletrims$redirectTrimGet(ItemStack stack, DataComponentType<T> componentType,
-                                                  EquipmentClientInfo.LayerType layerType,
-                                                  ResourceKey<EquipmentAsset> equipmentAssetId,
-                                                  Model<?> model, Object state,
-                                                  ItemStack itemStack,
-                                                  PoseStack poseStack,
-                                                  SubmitNodeCollector collector,
-                                                  int light,
-                                                  net.minecraft.resources.Identifier playerTexture,
-                                                  int dyeColor,
-                                                  int orderStart) {
-        // Only intercept TRIM reads, pass through anything else
-        if (componentType != DataComponents.TRIM) {
-            return stack.get(componentType);
+    private <S> void stackabletrims$redirectTrimSubmit(OrderedSubmitNodeCollector collector,
+                                                       Model<? super S> model, S state,
+                                                       PoseStack poseStack, RenderType renderType,
+                                                       int light, int overlay, int tinted,
+                                                       TextureAtlasSprite sprite, int outline,
+                                                       ModelFeatureRenderer.CrumblingOverlay crumbling,
+                                                       // enclosing renderLayers parameters (in order)
+                                                       EquipmentClientInfo.LayerType layerType,
+                                                       ResourceKey<EquipmentAsset> equipmentAssetId,
+                                                       Model<? super S> enclosingModel, S enclosingState,
+                                                       ItemStack itemStack) {
+        List<ArmorTrim> stacked = itemStack.get(StackableTrimsComponents.STACKABLETRIMS);
+        if (stacked == null || stacked.size() <= 1) {
+            // No stacked trims — submit the single vanilla trim exactly as it would have.
+            collector.submitModel(model, state, poseStack, renderType, light, overlay, tinted,
+                    sprite, outline, crumbling);
+            return;
         }
 
-        List<ArmorTrim> stacked = stack.get(StackableTrimsComponents.STACKABLETRIMS);
-        if (stacked != null && stacked.size() > 1) {
-            // Store context for the inject to render all stacked trims
-            stackabletrims$context.set(new RenderContext(
-                    stacked, layerType, equipmentAssetId, model, state,
-                    poseStack, collector, light, orderStart
-            ));
-            // Return null to suppress vanilla's single-trim rendering
-            return null;
-        }
+        // Render every stacked trim into the same (post base-layer) order bucket vanilla chose.
+        for (ArmorTrim trim : stacked) {
+            TextureAtlasSprite trimSprite = stackabletrims$lookupSprite(trim, layerType, equipmentAssetId);
+            if (trimSprite == null) continue;
 
-        // No stacked trims — let vanilla handle it normally
-        stackabletrims$context.remove();
-        return stack.get(componentType);
-    }
-
-    /**
-     * After the method finishes, render all stacked trims if we suppressed vanilla's render.
-     */
-    @Inject(
-            method = "renderLayers(Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;II)V",
-            at = @At("RETURN")
-    )
-    private <S> void stackabletrims$renderStackedTrims(EquipmentClientInfo.LayerType layerType,
-                                                        ResourceKey<EquipmentAsset> equipmentAssetId,
-                                                        Model<? super S> model, S state,
-                                                        ItemStack itemStack,
-                                                        PoseStack poseStack,
-                                                        SubmitNodeCollector collector,
-                                                        int light,
-                                                        net.minecraft.resources.Identifier playerTexture,
-                                                        int dyeColor,
-                                                        int orderStart,
-                                                        CallbackInfo ci) {
-        RenderContext ctx = stackabletrims$context.get();
-        if (ctx == null) return;
-        stackabletrims$context.remove();
-
-        // Don't render trims on baby models (vanilla skips this)
-        if (layerType == EquipmentClientInfo.LayerType.HUMANOID_BABY) return;
-
-        for (ArmorTrim trim : ctx.trims) {
-            TextureAtlasSprite sprite = stackabletrims$lookupSprite(trim, ctx.layerType, ctx.equipmentAssetId);
-            if (sprite == null) continue;
-
-            RenderType renderType = Sheets.armorTrimsSheet(trim.pattern().value().decal());
-
-            // Use orderStart for all trims to ensure they render in the correct phase and don't clash with glint/overlays
-            OrderedSubmitNodeCollector orderedCollector = collector.order(orderStart);
-            stackabletrims$submitTrimModel(orderedCollector, model, state, poseStack, renderType,
-                    light, sprite, dyeColor);
+            RenderType trimRenderType = Sheets.armorTrimsSheet(trim.pattern().value().decal());
+            collector.submitModel(model, state, poseStack, trimRenderType, light,
+                    OverlayTexture.NO_OVERLAY, -1, trimSprite, outline, null);
         }
     }
 
@@ -160,31 +119,4 @@ public class EquipmentLayerRendererMixin {
             return null;
         }
     }
-
-    /**
-     * Type-safe wrapper to call submitModel with proper generic inference.
-     */
-    @Unique
-    @SuppressWarnings("unchecked")
-    private static <S> void stackabletrims$submitTrimModel(OrderedSubmitNodeCollector orderedCollector,
-                                                            Model<? super S> model, S state,
-                                                            PoseStack poseStack, RenderType renderType,
-                                                            int light, TextureAtlasSprite sprite,
-                                                            int dyeColor) {
-        orderedCollector.submitModel(model, state, poseStack, renderType,
-                light, OverlayTexture.NO_OVERLAY, -1, sprite, dyeColor, null);
-    }
-
-    @Unique
-    private record RenderContext(
-            List<ArmorTrim> trims,
-            EquipmentClientInfo.LayerType layerType,
-            ResourceKey<EquipmentAsset> equipmentAssetId,
-            Model<?> model,
-            Object state,
-            PoseStack poseStack,
-            SubmitNodeCollector collector,
-            int light,
-            int orderStart
-    ) {}
 }
