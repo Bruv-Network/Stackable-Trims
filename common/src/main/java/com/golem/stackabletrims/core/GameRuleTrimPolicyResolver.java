@@ -21,7 +21,7 @@ public final class GameRuleTrimPolicyResolver {
         if (level.getServer() == null) {
             return new GameRuleTrimPolicy();
         }
-        GameRules rules = level.getServer().getGameRules();
+        GameRules rules = level.getServer().getWorldData().getGameRules();
         int max = MAX_TRIM_STACK != null ? rules.get(MAX_TRIM_STACK) : 32;
         boolean allowDup = ALLOW_DUPLICATE_TRIMS != null ? rules.get(ALLOW_DUPLICATE_TRIMS) : false;
         final int fMax = max;

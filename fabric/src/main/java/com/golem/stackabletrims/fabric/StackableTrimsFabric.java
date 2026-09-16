@@ -3,7 +3,9 @@ package com.golem.stackabletrims.fabric;
 import com.golem.stackabletrims.StackableTrims;
 import com.golem.stackabletrims.component.StackableTrimsComponents;
 import com.golem.stackabletrims.core.GameRuleTrimPolicyResolver;
+import com.golem.stackabletrims.showcase.ShowcaseCommand;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
 import net.fabricmc.loader.api.FabricLoader;
@@ -36,7 +38,10 @@ public class StackableTrimsFabric implements ModInitializer {
                 .category(GameRuleCategory.MISC)
                 .buildAndRegister(Identifier.withDefaultNamespace("allow_duplicate_trims"));
         ServerTickEvents.END_SERVER_TICK.register(server ->
-                StackableTrims.setGameRules(server.getGameRules())
+                StackableTrims.setGameRules(server.getWorldData().getGameRules())
+        );
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
+                ShowcaseCommand.register(dispatcher)
         );
         StackableTrims.LOGGER.info("Stackable Trims Fabric initialized");
     }

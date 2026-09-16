@@ -1,6 +1,9 @@
 package com.golem.stackabletrims.mixin;
 
 import com.golem.stackabletrims.component.StackableTrimsComponents;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
@@ -20,7 +23,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -57,38 +59,39 @@ public class EquipmentLayerRendererMixin {
     }
 
     /**
-     * Redirect vanilla's single-trim {@code submitModel} call (the last {@code submitModel} in
+     * Wrap vanilla's single-trim {@code submitModel} call (the last {@code submitModel} in
      * {@code renderLayers}, ordinal 2 after the base layer and foil calls).
      *
      * <p>Vanilla submits the trim through {@code submitNodeCollector.order(nextOrder++)}, i.e. a
      * collector ordered <em>after</em> all the base armor layers so the trim decal draws on top.
-     * By redirecting at this exact call we reuse that correct ordering for every stacked trim,
+     * By wrapping this exact call ({@code @WrapOperation} rather than {@code @Redirect}, which
+     * chains with other mods and avoids MixinExtras' redirect pre-processing that broke on
+     * NeoForge) we reuse that correct ordering for every stacked trim,
      * instead of submitting them to the base-layer order bucket. The latter only happened to work
      * in the vanilla pipeline because the trims were submitted last within the shared bucket; under
      * Sodium, which reorders/batches a bucket by render type, the opaque armor would draw over the
      * trim decals and they would vanish.
      */
-    @Redirect(
+    @WrapOperation(
             method = "renderLayers(Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;II)V",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/OrderedSubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V",
                     ordinal = 2)
     )
-    private <S> void stackabletrims$redirectTrimSubmit(OrderedSubmitNodeCollector collector,
-                                                       Model<? super S> model, S state,
-                                                       PoseStack poseStack, RenderType renderType,
-                                                       int light, int overlay, int tinted,
-                                                       TextureAtlasSprite sprite, int outline,
-                                                       ModelFeatureRenderer.CrumblingOverlay crumbling,
-                                                       // enclosing renderLayers parameters (in order)
-                                                       EquipmentClientInfo.LayerType layerType,
-                                                       ResourceKey<EquipmentAsset> equipmentAssetId,
-                                                       Model<? super S> enclosingModel, S enclosingState,
-                                                       ItemStack itemStack) {
+    private <S> void stackabletrims$wrapTrimSubmit(OrderedSubmitNodeCollector collector,
+                                                   Model<? super S> model, S state,
+                                                   PoseStack poseStack, RenderType renderType,
+                                                   int light, int overlay, int tinted,
+                                                   TextureAtlasSprite sprite, int outline,
+                                                   ModelFeatureRenderer.CrumblingOverlay crumbling,
+                                                   Operation<Void> original,
+                                                   @Local(argsOnly = true) EquipmentClientInfo.LayerType layerType,
+                                                   @Local(argsOnly = true) ResourceKey<EquipmentAsset> equipmentAssetId,
+                                                   @Local(argsOnly = true) ItemStack itemStack) {
         List<ArmorTrim> stacked = itemStack.get(StackableTrimsComponents.STACKABLETRIMS);
         if (stacked == null || stacked.size() <= 1) {
             // No stacked trims — submit the single vanilla trim exactly as it would have.
-            collector.submitModel(model, state, poseStack, renderType, light, overlay, tinted,
+            original.call(collector, model, state, poseStack, renderType, light, overlay, tinted,
                     sprite, outline, crumbling);
             return;
         }

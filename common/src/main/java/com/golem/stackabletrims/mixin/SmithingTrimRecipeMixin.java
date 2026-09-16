@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.golem.stackabletrims.core.CoreServices;
 import com.golem.stackabletrims.core.TrimPolicy;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
 import net.minecraft.world.item.equipment.trim.TrimPattern;
@@ -22,7 +23,7 @@ public class SmithingTrimRecipeMixin {
                     target = "Lnet/minecraft/world/item/ItemStack;copyWithCount(I)Lnet/minecraft/world/item/ItemStack;"),
             cancellable = true
     )
-    private static void handleStackableTrims(ItemStack base, ItemStack addition, Holder<TrimPattern> pattern,
+    private static void handleStackableTrims(HolderLookup.Provider registries, ItemStack base, ItemStack addition, Holder<TrimPattern> pattern,
                                              CallbackInfoReturnable<ItemStack> cir,
                                              @Local(ordinal = 1) ArmorTrim newTrim) {
 
