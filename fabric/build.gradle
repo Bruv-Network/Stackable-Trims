@@ -51,3 +51,14 @@ shadowJar {
 }
 
 assemble.dependsOn shadowJar
+// Fabric client game tests: `./gradlew :fabric:runClientGameTest` launches the client, creates a
+// flat world, spawns armor stands with stacked trims, takes screenshots into
+// fabric/build/run/clientGameTest/screenshots and asserts the stacked trims are actually drawn.
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = 'stackabletrims-gametest'
+		enableGameTests = false
+		eula = true
+	}
+}

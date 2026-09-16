@@ -3,6 +3,7 @@ package com.golem.stackabletrims.neoforge;
 import com.golem.stackabletrims.StackableTrims;
 import com.golem.stackabletrims.component.StackableTrimsComponents;
 import com.golem.stackabletrims.core.GameRuleTrimPolicyResolver;
+import com.golem.stackabletrims.showcase.ShowcaseCommand;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
@@ -13,6 +14,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -38,6 +40,7 @@ public class StackableTrimsNeoForge {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::onRegister);
         NeoForge.EVENT_BUS.addListener(this::onServerTick);
+        NeoForge.EVENT_BUS.addListener(this::onRegisterCommands);
 
         //better-trim-tooltips compatibility
         StackableTrims.setIsBetterTrimTooltipsEnabled(ModList.get().isLoaded("better-trim-tooltips"));
@@ -63,6 +66,10 @@ public class StackableTrimsNeoForge {
 
     private void commonSetup(FMLCommonSetupEvent event) {
         StackableTrimsComponents.STACKABLETRIMS = STACKABLETRIMS_COMPONENT.get();
+    }
+
+    private void onRegisterCommands(RegisterCommandsEvent event) {
+        ShowcaseCommand.register(event.getDispatcher());
     }
 
     private void onServerTick(ServerTickEvent.Post event) {

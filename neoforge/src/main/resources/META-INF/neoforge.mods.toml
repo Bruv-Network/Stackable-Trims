@@ -11,19 +11,19 @@ authors = "Golem"
 description = '''
 Allows you to stack as many trims as you want!
 '''
-logoFile = "icon.png"
+iconFile = "icon.png"
 
 [[dependencies.stackabletrims]]
 modId = "neoforge"
 type = "required"
-versionRange = "[26.1,)"
+versionRange = "[26.3,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.stackabletrims]]
 modId = "minecraft"
 type = "required"
-versionRange = "[26.1,)"
+versionRange = "[26.3,)"
 ordering = "NONE"
 side = "BOTH"
 
