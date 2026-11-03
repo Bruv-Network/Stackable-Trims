@@ -39,3 +39,9 @@ replay_*.log
 *.hprof
 *.jfr
 /remappedSrc/
+
+# stonecutter / gradle nodes
+versions/*/build/
+versions/*/.gradle/
+versions/*/runs/
+.kotlin/

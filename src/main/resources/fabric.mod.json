@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_author}"
+  ],
+  "contact": {
+    "homepage": "${mod_homepage}",
+    "sources": "${mod_sources}",
+    "issues": "${mod_issues}"
+  },
+  "license": "${mod_license}",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.golem.stackabletrims.fabric.StackableTrimsFabric"
+    ],
+    "client": [
+      "com.golem.stackabletrims.fabric.client.StackableTrimsFabricClient"
+    ]
+  },
+  "mixins": [
+    "stackabletrims.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader}",
+    "minecraft": "${minecraft_range}",
+    "java": ">=${java_version}",
+    "fabric-api": "*"
+  }
+}

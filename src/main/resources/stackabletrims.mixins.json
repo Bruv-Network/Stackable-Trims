@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.golem.stackabletrims.mixin",
+  "compatibilityLevel": "${mixin_compatibility}",
+  "refmap": "stackabletrims.refmap.json",
+  "mixins": [
+    ${mixins}
+  ],
+  "client": [
+    ${client_mixins}
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

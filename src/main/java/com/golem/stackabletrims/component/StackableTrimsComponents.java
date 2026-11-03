@@ -1,0 +1,29 @@
+package com.golem.stackabletrims.component;
+
+//? if >=1.20.5 {
+import com.mojang.serialization.Codec;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.world.item.equipment.trim.ArmorTrim;
+
+import java.util.List;
+
+public class StackableTrimsComponents {
+
+    public static DataComponentType<List<ArmorTrim>> STACKABLETRIMS;
+
+    public static DataComponentType<List<ArmorTrim>> createStackableTrimsComponent() {
+        return DataComponentType.<List<ArmorTrim>>builder()
+                .persistent(Codec.list(ArmorTrim.CODEC))
+                .networkSynchronized(ByteBufCodecs.collection(
+                        java.util.ArrayList::new,
+                        ArmorTrim.STREAM_CODEC
+                ))
+                .build();
+    }
+}
+//?} else {
+/*/^* Before 1.20.5 the stacked trims are NBT; see DefaultTrimStackService. ^/
+public class StackableTrimsComponents {
+}
+*///?}
