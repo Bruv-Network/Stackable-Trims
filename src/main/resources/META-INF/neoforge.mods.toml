@@ -10,7 +10,7 @@ displayName = "${mod_name}"
 displayURL = "${mod_homepage}"
 authors = "${mod_author}"
 description = '''${mod_description}'''
-logoFile = "icon.png"
+${icon_key} = "icon.png"
 
 [[dependencies.${mod_id}]]
 modId = "neoforge"

@@ -65,6 +65,8 @@ tasks.processResources {
         "mod_issues" to prop("mod.issues"),
         "minecraft_range" to prop("deps.minecraft_range"),
         "neoforge_range" to prop("deps.neoforge_range"),
+        // NeoForge 26.2 deprecated logoFile and stops at a warning screen on every launch for mods that use it.
+        "icon_key" to if (stonecutter.eval(mcVersion, ">=26.2")) "iconFile" else "logoFile",
         "mixin_compatibility" to if (javaVersion <= 17) "JAVA_17" else "JAVA_21",
         "mixins" to mixinList(
             true to "AnvilScreenHandlerMixin",
